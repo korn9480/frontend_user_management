@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import Link from "next/link"
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from "lucide-react"
@@ -8,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { signIn } from "next-auth/react"
 
 interface FormData {
   email: string
@@ -45,7 +45,6 @@ export default function LoginPage() {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
-    
     if (!formData.email) {
       newErrors.email = 'กรุณากรอกอีเมล'
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -71,9 +70,13 @@ export default function LoginPage() {
     
     try {    
       // Simulate API call
-      
+      await signIn("credentials", {
+        username: formData.email,
+        password: formData.password,
+        callbackUrl: "/users"
+      });
     } catch (error) {
-      
+      console.log(">>> page error ")
     } finally {
       setIsLoading(false)
     }
@@ -86,10 +89,12 @@ export default function LoginPage() {
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl mb-4">
-                <User className="w-8 h-8 text-white" />
+              <div>
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl mb-4">
+                  <User className="w-8 h-8 text-white" />
+                </div>
+                <h5>เข้าสู่ระบบ</h5>
               </div>
-              <h5>เข้าสู่ระบบ</h5>
             </CardTitle>
             <CardDescription className="text-center">
               กรอกอีเมลและรหัสผ่านเพื่อเข้าสู่ระบบ
