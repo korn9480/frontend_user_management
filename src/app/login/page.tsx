@@ -76,7 +76,7 @@ export default function LoginPage() {
         callbackUrl: "/users"
       });
     } catch (error) {
-      console.log(">>> page error ")
+      
     } finally {
       setIsLoading(false)
     }

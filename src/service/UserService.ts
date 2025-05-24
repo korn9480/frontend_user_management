@@ -16,17 +16,21 @@ export class UserService {
     return respose.data
   }
 
-  async createUser(body: UserDto): Promise<ApiResponse<UserResponse[]>> {
-    const respose = await this.api.post("/user",body)
+  async createUser(body: UserDto): Promise<ApiResponse<UserResponse>> {
+    console.log("🚀 ~ UserService ~ createUser ~ body:", body)
+    const respose = await this.api.post("/user",{
+      ...body,
+      role_id: body.role_id
+    })
     return respose.data
   }
 
-  async updateUser(id: number, body: UserDto): Promise<ApiResponse<UserResponse[]>> {
+  async updateUser(id: number, body: UserDto): Promise<ApiResponse<UserResponse>> {
     const respose = await this.api.put(`/user/${id}`,body)
     return respose.data
   }
 
-  async delteUser(id: number): Promise<ApiResponse<UserResponse[]>> {
+  async delteUser(id: number): Promise<ApiResponse<UserResponse>> {
     const respose = await this.api.delete(`/user/${id}`)
     return respose.data
   }
