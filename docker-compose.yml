@@ -1,0 +1,14 @@
+services:
+  frontend_user_management:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - ISPRODUCTION=false
+    networks:
+      - dev
+
+networks:
+  dev:
+    external: true
+
