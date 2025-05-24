@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend User Management
 
-## Getting Started
+ระบบจัดการผู้ใช้งานด้วย Next.js และ Next Auth สำหรับการจัดการข้อมูลผู้ใช้
 
-First, run the development server:
+## 🚀 เทคโนโลยีที่ใช้
+
+- **Framework**: Next.js
+- **Runtime**: Bun
+- **Authentication**: NextAuth
+- **UI Library**: shadcn/ui
+- **Containerization**: Docker
+
+## ✨ ฟีเจอร์
+
+### 🔐 ระบบการยืนยันตัวตน
+- ระบบ Login โดยใช้ NextAuth
+- การจัดการ Session และ Authentication
+
+### 👥 การจัดการผู้ใช้
+- **Get Users**: ดูรายชื่อผู้ใช้ทั้งหมด
+- **Add User**: เพิ่มผู้ใช้ใหม่
+
+## 📱 หน้าเว็บไซต์
+
+1. **หน้า Login** - สำหรับการเข้าสู่ระบบ
+2. **หน้า User** - สำหรับการจัดการข้อมูลผู้ใช้
+
+## 🛠 การติดตั้งและใช้งาน
+
+### ขั้นตอนที่ 1: Clone Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Clone โปรเจคจาก GitHub
+git clone <repository-url>
+
+# เข้าไปในโฟลเดอร์โปรเจค
+cd frontend_user_management
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### ขั้นตอนที่ 2: รัน Docker Compose
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# รันคำสั่งสำหรับ Docker Compose
+docker compose up -d
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+คำสั่งนี้จะ:
+- ดาวน์โหลดและติดตั้ง dependencies ทั้งหมด
+- สร้าง container สำหรับแอปพลิเคชัน
+- รัน service ในโหมด detached mode (-d)
 
-## Learn More
+### ขั้นตอนที่ 3: เข้าใช้งานระบบ
 
-To learn more about Next.js, take a look at the following resources:
+เปิดเบราว์เซอร์และไปที่:
+```
+http://localhost:3000
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔧 การพัฒนาเพิ่มเติม
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### การติดตั้งในโหมดพัฒนา (Development Mode)
 
-## Deploy on Vercel
+หากต้องการพัฒนาโปรเจคเพิ่มเติม:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# ติดตั้ง dependencies
+bun install
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# รันในโหมดพัฒนา
+bun run dev
+```
+
+### โครงสร้างโปรเจค
+
+```
+frontend_user_management/
+├── app/                    # Next.js App Router
+├── components/            # React Components
+├── lib/                   # Utility functions
+├── public/               # Static files
+├── docker-compose.yml    # Docker configuration
+├── Dockerfile           # Docker build instructions
+├── package.json         # Package dependencies
+└── README.md           # Documentation
+```
+
+## 🎨 UI Components
+
+โปรเจคนี้ใช้ **shadcn/ui** สำหรับ UI components ที่มีความสวยงามและใช้งานง่าย
