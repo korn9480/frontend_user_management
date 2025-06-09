@@ -5,13 +5,23 @@ import { Eye, EyeOff } from "lucide-react"
 import { ReactNode, useState } from "react"
 import { Control, FieldPath, FieldValues } from "react-hook-form"
 import { Button } from "../ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 
-type ReusableFormFieldProps<T extends FieldValues> = {
+type FieldInputProps<T extends FieldValues> = {
   readonly control: Control<T>
   readonly name: FieldPath<T>
   readonly label: string
   readonly placeholder?: string,
   readonly icon?: ReactNode 
+}
+
+type FieldSelectOption = {
+  value: string | number
+  label: string
+}
+
+type FieldSelectProps<T extends FieldValues> = FieldInputProps<T> & {
+  readonly options: FieldSelectOption[]
 }
 
 export function FieldInput<T extends FieldValues>({
@@ -20,7 +30,7 @@ export function FieldInput<T extends FieldValues>({
   label,
   placeholder,
   icon
-}: ReusableFormFieldProps<T>) {
+}: FieldInputProps<T>) {
   return (
     <FormField
       control={control}
@@ -53,7 +63,7 @@ export function FieldInputPassword<T extends FieldValues>({
   label,
   placeholder,
   icon
-}: ReusableFormFieldProps<T>) {
+}: FieldInputProps<T>) {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <FormField
@@ -94,4 +104,54 @@ export function FieldInputPassword<T extends FieldValues>({
       )}
     />
   )
+}
+
+export function FieldSelect<T extends FieldValues>
+  ({
+  control,
+  name,
+  label,
+  placeholder,
+  icon,
+  options
+}: FieldSelectProps<T>){
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>{label}</FormLabel>
+          <div className=" relative">
+            <FormControl>
+              <div className="relative">
+                {icon && (
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                    {icon}
+                  </span>
+                )}
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger className={`w-full ${icon ? "pl-10" : ""}`}>
+                    <SelectValue placeholder={placeholder} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {options.map((option) => (
+                      <SelectItem key={option.value} value={option.value.toString()}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </FormControl>
+          </div>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  ) 
 }

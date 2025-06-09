@@ -1,6 +1,6 @@
 'use client'
 
-import { UserService } from "@/service/userService";
+import { UserService } from "@/service/UserService";
 import { UserResponse } from "@/types/interface/response/user";
 import { useSession } from "next-auth/react"
 import { useEffect, useState, useMemo } from "react";
@@ -12,6 +12,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import DrawerUserForm from "@/components/users/userForm";
 import { RoleUser } from "@/types/enum/role";
 import { UserCard } from "@/components/users/cardUser";
+import { DrawerModeFormUserEnum } from "@/types/enum/formUse";
 
 // Role colors mapping
 const getRoleColor = (roleName: string) => {
@@ -36,7 +37,7 @@ export default function Page() {
     
     // Drawer states
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [drawerMode, setDrawerMode] = useState<'add' | 'edit'>('add');
+    const [drawerMode, setDrawerMode] = useState<DrawerModeFormUserEnum>(DrawerModeFormUserEnum.add);
     const [selectedUser, setSelectedUser] = useState<UserResponse | undefined>();
     
     useEffect(() => {
@@ -82,30 +83,23 @@ export default function Page() {
     };
 
     const handleAddUser = () => {
-        setDrawerMode('add');
+        setDrawerMode(DrawerModeFormUserEnum.add);
         setSelectedUser(undefined);
         setDrawerOpen(true);
     };
 
     const handleEditUser = (user: UserResponse) => {
-        setDrawerMode('edit');
+        setDrawerMode(DrawerModeFormUserEnum.edit);
         setSelectedUser(user);
         setDrawerOpen(true);
     };
 
-    const handleFormSubmit = async (formData: any) => {
-        if (drawerMode === 'add') {
-            // ลบ key data ที่ไม่จำเป็นต้องส่งไปหลังบ้าน
-            delete formData.confirmPassword
-            formData.role_id = formData.roleId
-            delete formData.roleId
-            const resUser =  await userService.createUser(formData)
-            setUsers([resUser.data, ...users])
+    const getNewlyCreatedUser = async (userNew: UserResponse) => {
+        if (drawerMode === DrawerModeFormUserEnum.add) {
+            // const resUser =  await userService.createUser(formData)
+            setUsers([userNew, ...users])
             setDrawerOpen(false);
-        } else if (drawerMode === 'edit' && selectedUser) {
-            // TODO: Call API to update user
-            console.log('Updating user:', selectedUser.id, formData);
-            // For now, just close the drawer
+        } else if (drawerMode === DrawerModeFormUserEnum.edit && selectedUser) {
             setDrawerOpen(false);
         }
     };
@@ -113,9 +107,7 @@ export default function Page() {
     const handleDeleteUser = async (userId: number) => {
         if (confirm('คุณต้องการลบผู้ใช้นี้หรือไม่?')) {
             try {
-                // TODO: Call API to delete user
                 console.log('Deleting user:', userId);
-                // For now, just remove from state
                 setUsers(users.filter(user => user.id !== userId));
             } catch (error) {
                 console.error("Error deleting user:", error);
@@ -225,7 +217,7 @@ export default function Page() {
                             selectedUser={selectedUser}
                             drawerOpen={drawerOpen}
                             drawerMode={drawerMode}
-                            handleFormSubmit={handleFormSubmit}
+                            getNewlyCreatedUser={getNewlyCreatedUser}
                             setDrawerOpen={setDrawerOpen}
                         />
                     </div>
