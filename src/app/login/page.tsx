@@ -1,13 +1,17 @@
 "use client"
 import { useState } from "react"
 import Link from "next/link"
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from "lucide-react"
+import { Lock, User, ArrowRight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { Form } from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from "zod"
+import { FieldInput, FieldInputPassword } from "@/components/share/form"
 
 interface FormData {
   email: string
@@ -20,63 +24,50 @@ interface FormErrors {
 }
 
 export default function LoginPage() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState<FormData>({
-    email: '',
-    password: ''
+  const router = useRouter()
+
+  const formSchemaLogin = z.object({
+  email: z.string().email({
+    message: "email ไม่ถูกต้อง"
+  }),
+  password: z.string()
+    .min(6, { message: "รหัสผ่านต้องมากกว่า 6 ตัวอักษร" })
+})
+
+const formLogin = useForm<z.infer<typeof formSchemaLogin>>({
+    resolver: zodResolver(formSchemaLogin),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   })
-  const [errors, setErrors] = useState<FormErrors>({})
+
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-    // Clear error when user starts typing
-    if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }))
-    }
-  }
-
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {}
-    if (!formData.email) {
-      newErrors.email = 'กรุณากรอกอีเมล'
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'รูปแบบอีเมลไม่ถูกต้อง'
-    }
-    
-    if (!formData.password) {
-      newErrors.password = 'กรุณากรอกรหัสผ่าน'
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'รหัสผ่านต้องมีอย่างน้อย 6 ตัว'
-    }
-    
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!validateForm()) return
-    
+  const handleSubmit = async (formData: z.infer<typeof formSchemaLogin>) => {
     setIsLoading(true)
     
     try {    
       // Simulate API call
-      await signIn("credentials", {
+      const responseLogin = await signIn("credentials", {
         username: formData.email,
         password: formData.password,
-        callbackUrl: "/users"
+        redirect: false
       });
-    } catch (error) {
-      
+      if (responseLogin?.ok) {
+        return router.push("/users")
+      }
+      else if(responseLogin?.error) {
+        if (responseLogin.error.includes("email")) {
+          formLogin.setError("email", {
+            message: "email ไม่มีในระบบ"
+          });
+        } else if (responseLogin.error.includes("password")) {
+          formLogin.setError("password",{
+            message: "รหัสผ่านไม่ถูก"
+          })
+        }
+      }
     } finally {
       setIsLoading(false)
     }
@@ -101,99 +92,44 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Email Field */}
-              <div className="space-y-2">
-                <Label htmlFor="email">อีเมล</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="อีเมล"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className={`pl-10 ${errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
-                  />
-                </div>
-                {errors.email && (
-                  <p className="text-sm text-red-600">{errors.email}</p>
-                )}
-              </div>
-
-              {/* Password Field */}
-              <div className="space-y-2">
-                <Label htmlFor="password">รหัสผ่าน</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="รหัสผ่าน"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className={`pl-10 pr-10 ${errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-gray-400" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-gray-400" />
-                    )}
-                  </Button>
-                </div>
-                {errors.password && (
-                  <p className="text-sm text-red-600">{errors.password}</p>
-                )}
-              </div>
-
-              {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <input
-                    id="remember"
-                    type="checkbox"
-                    className="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary"
-                  />
-                  <Label htmlFor="remember" className="text-sm font-normal cursor-pointer">
-                    จดจำการเข้าสู่ระบบ
-                  </Label>
-                </div>
-                <Button variant="link" size="sm" className="px-0 font-normal">
-                  ลืมรหัสผ่าน?
+            <Form {...formLogin}>
+              <form onSubmit={formLogin.handleSubmit(handleSubmit)} className="space-y-4">
+                <FieldInput
+                  control={formLogin.control}
+                  name="email"
+                  label="Email"
+                  placeholder="email"
+                  icon={<User/>}
+                />
+                <FieldInputPassword 
+                  control={formLogin.control}
+                  name="password"
+                  label="Password"
+                  placeholder="password"
+                  icon={<Lock/>}
+                />
+                {/* Login Button */}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      กำลังเข้าสู่ระบบ...
+                    </>
+                  ) : (
+                    <>
+                      เข้าสู่ระบบ
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </>
+                  )}
                 </Button>
-              </div>
+              </form>
+            </Form>
 
-              {/* Login Button */}
-              <Button
-                type="submit"
-                className="w-full"
-                size="lg"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                    กำลังเข้าสู่ระบบ...
-                  </>
-                ) : (
-                  <>
-                    เข้าสู่ระบบ
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </>
-                )}
-              </Button>
-            </form>
-
-            {/* Divider & Register Link */}
             <div className="mt-6 pt-6 border-t border-gray-200">
               <p className="text-center text-sm text-gray-600">
                 ยังไม่มีบัญชี?{' '}

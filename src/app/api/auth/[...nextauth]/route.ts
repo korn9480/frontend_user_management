@@ -33,10 +33,11 @@ const handler = NextAuth({
               accessToken: token,      // เพิ่ม field ที่ต้องการ
               role: user.role,
             }
-          }  
-          return null;
-        } catch (e) {
-          return null
+          } 
+          throw new Error(res.data?.message || "Invalid credentials");
+
+        } catch(e:any) {
+          throw new Error(e)
         }
       },
       type: "credentials",
