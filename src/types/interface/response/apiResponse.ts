@@ -2,10 +2,10 @@ export interface ApiResponse<T> {
     message: string
     data:T
     error?: any
-    pagination?: Pagination
+    pagination?: PaginationReponse
 }
 
-export interface Pagination {
+export interface PaginationReponse {
   current_page: number;
   has_next: boolean;
   limit: number;

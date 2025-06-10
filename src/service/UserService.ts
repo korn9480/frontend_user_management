@@ -2,12 +2,17 @@ import { ApiClient } from './api';
 import { UserResponse } from '@/types/interface/response/user';
 import { ApiResponse } from '@/types/interface/response/apiResponse';
 import { UserDtoCreated, UserDtoUpdate } from '@/types/interface/formData/user';
+import { PaginationSearch } from '@/types/interface/search/pagination';
 export class UserService {
   private readonly api = ApiClient.getInstance().getApi();
 
-  async getUserAll(search?: string): Promise<ApiResponse<UserResponse[]>> {
-    const urlQuery = search? "?search=${search}": ""
-    const respose = await this.api.get(`/user${urlQuery}`)
+  async getUserAll(search: PaginationSearch): Promise<ApiResponse<UserResponse[]>> {
+    const params = new URLSearchParams();
+    if (search.search) params.append("search", search.search);
+    if (search.limit) params.append("limit", String(search.limit));
+    if (search.page) params.append("page", String(search.page))
+    // const urlQuery = search? "?search=${search}": ""
+    const respose = await this.api.get(`/user?${params.toString()}`);
     return respose.data
   }
 

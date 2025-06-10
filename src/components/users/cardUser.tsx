@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { UserResponse } from "@/types/interface/response/user";
 import { useSession } from "next-auth/react";
 import { RoleUser } from "@/types/enum/role";
+import { Skeleton } from "../ui/skeleton";
 
 interface UserCardProp {
     user: UserResponse
@@ -80,6 +81,38 @@ export function UserCard({user ,colorRole, handleDeleteUser,handleEditUser}: Use
               </Button>
             </div>
           )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function UserCardSkeleton() {
+  return (
+    <Card className="w-80">
+      <CardHeader className="pb-3">
+        <div className="flex items-start gap-4">
+          <Skeleton className="w-12 h-12 rounded-full" />
+          <div className="flex-1 min-w-0">
+            <Skeleton className="h-5 w-32 mb-2" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-4" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="space-y-3">
+          <Skeleton className="h-6 w-16 rounded-full" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className="h-4 w-28" />
+          </div>
+          <div className="flex items-center gap-2 pt-2">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <Skeleton className="h-8 w-8 rounded-full" />
+          </div>
         </div>
       </CardContent>
     </Card>

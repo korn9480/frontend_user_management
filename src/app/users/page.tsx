@@ -11,9 +11,12 @@ import { Input } from '@/components/ui/input';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import DrawerUserForm from "@/components/users/userForm";
 import { RoleUser } from "@/types/enum/role";
-import { UserCard } from "@/components/users/cardUser";
+import { UserCard, UserCardSkeleton } from "@/components/users/cardUser";
 import { DrawerModeFormUserEnum } from "@/types/enum/formUse";
 import UserDeletedDialog from "@/components/users/userDeleted";
+import Pagination from "@/components/share/pagination";
+import { PaginationReponse } from "@/types/interface/response/apiResponse";
+import { ContentUsers } from "@/components/users/contentUsers";
 
 // Role colors mapping
 const getRoleColor = (roleName: string) => {
@@ -34,8 +37,13 @@ export default function Page() {
     const [users, setUsers] = useState<UserResponse[]>([])
     const [searchTerm, setSearchTerm] = useState('');
     const [roleFilter, setRoleFilter] = useState<string>('all');
-    const [loading, setLoading] = useState(true);
     
+    // get data form api
+    const [page, setPage] = useState<number>(1)
+    const limit = 2
+    const [pagination, setPagination] = useState<PaginationReponse>()
+    const [isLoading, setIsLoading] = useState<boolean>(true)
+
     // Drawer states
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [drawerMode, setDrawerMode] = useState<DrawerModeFormUserEnum>(DrawerModeFormUserEnum.add);
@@ -44,37 +52,33 @@ export default function Page() {
     // delete states
     const [diologDeletedOpen, setDiologDeletedOpen] = useState(false);
     
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                setLoading(true);
-                const data = await userService.getUserAll()
-                const users = data.data
-                setUsers(users || []);
-            } catch (error) {
-                setUsers([]);
-            } finally {
-                setLoading(false);
-            }
+    const fetchUsers = async () => {
+        try {
+            setIsLoading(true)
+            const data = await userService.getUserAll({
+                search: searchTerm,
+                limit: limit,
+                page: page
+            })
+            const users = data.data
+            setUsers(users || []);
+            setPagination(data.pagination)
+        } catch (error) {
+            setUsers([]);
+        } finally {
+            setIsLoading(false)
         }
+    }
+
+    useEffect(() => {
         fetchUsers()
-    }, [])
+    }, [page, searchTerm])
 
     // Get unique roles for filter
     const roles = useMemo(() => {
         const uniqueRoles = Array.from(new Set(users.map(user => user.role.name)));
         return uniqueRoles;
     }, [users]);
-
-    // Filter users
-    const filteredUsers = useMemo(() => {
-        return users.filter(user => {
-            const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                              user.email.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesRole = roleFilter === 'all' || user.role.name === roleFilter;
-            return matchesSearch && matchesRole;
-        });
-    }, [users, searchTerm, roleFilter]);
 
     // method create user
     const handleAddUser = () => {
@@ -153,8 +157,12 @@ export default function Page() {
                                     <Input
                                         type="text"
                                         placeholder="ค้นหาผู้ใช้..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        defaultValue={searchTerm}
+                                        onChange={(e) => {
+                                            setTimeout(()=> {
+                                                setSearchTerm(e.target.value)
+                                            },500)
+                                        }}
                                         className="pl-10"
                                     />
                                 </div>
@@ -183,35 +191,20 @@ export default function Page() {
                     </CardContent>
                 </Card>
 
-                {/* Users Grid - Horizontal layout */}
-                <div className="flex flex-wrap gap-4">
-                    {filteredUsers.map((user, index) => (
-                        <UserCard
-                            key={index}
-                            user={user}
-                            colorRole={getRoleColor(user.role.name)}
-                            handleEditUser={handleEditUser}
-                            handleDeleteUser={handleDeleteUser}
-                        />
-                    ))}
-                </div>
+                <ContentUsers
+                    handleDeleteUser={handleDeleteUser}
+                    handleEditUser={handleEditUser}
+                    users={users}
+                    isLoading={isLoading}
+                />
 
-                {/* No Results */}
-                {filteredUsers.length === 0 && !loading && (
-                    <Card className="p-12">
-                        <div className="text-center">
-                            <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">ไม่พบผู้ใช้</h3>
-                            <p className="text-gray-500">ไม่พบผู้ใช้ที่ตรงกับเงื่อนไขการค้นหา</p>
-                        </div>
-                    </Card>
-                )}
-
-                {/* Results Count */}
-                {filteredUsers.length > 0 && (
-                    <div className="mt-8 text-center text-sm text-gray-500">
-                        แสดง {filteredUsers.length} จาก {users.length} ผู้ใช้
-                    </div>
+                
+                {pagination && (
+                    <Pagination
+                        currentPage={page}
+                        onPageChange={setPage}
+                        pageAll={Math.ceil(pagination.total_items / pagination.limit)}
+                    />
                 )}
             </div>
 
