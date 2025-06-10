@@ -1,4 +1,5 @@
 import { DefaultSession } from "next-auth"
+import { RoleUser } from "./enum/role"
 
 interface Role {
   name: string,
@@ -17,13 +18,13 @@ declare module "next-auth" {
    */
   interface DefaultUser {
     accessToken: string,
-    role: Role
+    role: RoleUser
   }
 
   interface Session {
     user: {
       /** The user's postal address. */
-      role: Role
+      role: RoleUser
     } & DefaultSession["user"],
     accessToken: string
   }

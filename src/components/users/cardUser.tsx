@@ -2,6 +2,8 @@ import { Calendar, Edit, Mail, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { UserResponse } from "@/types/interface/response/user";
+import { useSession } from "next-auth/react";
+import { RoleUser } from "@/types/enum/role";
 
 interface UserCardProp {
     user: UserResponse
@@ -10,15 +12,16 @@ interface UserCardProp {
     handleDeleteUser: (user: UserResponse) => void
 }
 export function UserCard({user ,colorRole, handleDeleteUser,handleEditUser}: UserCardProp) {
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('th-TH', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
+  const { data: session } = useSession()
+  const formatDate = (dateString: string) => {
+      return new Date(dateString).toLocaleDateString('th-TH', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+      });
+  };
   return (
     <Card key={user.id} className="w-80 hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
@@ -55,26 +58,28 @@ export function UserCard({user ,colorRole, handleDeleteUser,handleEditUser}: Use
           </div>
 
           {/* Actions - Icon only buttons */}
-          <div className="flex items-center gap-2 pt-2">
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={() => handleEditUser(user)}
-              className="text-green-600 hover:text-green-700 hover:bg-green-50"
-              title="แก้ไข"
-            >
-              <Edit className="w-4 h-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={() => handleDeleteUser(user)}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-              title="ลบ"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </div>
+          {session?.user.role == RoleUser.admin && (
+            <div className="flex items-center gap-2 pt-2">
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => handleEditUser(user)}
+                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                title="แก้ไข"
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => handleDeleteUser(user)}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                title="ลบ"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

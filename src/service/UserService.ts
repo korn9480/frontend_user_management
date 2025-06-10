@@ -17,7 +17,6 @@ export class UserService {
   }
 
   async createUser(body: UserDtoCreated): Promise<ApiResponse<UserResponse>> {
-    console.log("🚀 ~ UserService ~ createUser ~ body:", body)
     const respose = await this.api.post("/user",{
       ...body,
       role_id: body.role_id

@@ -83,7 +83,6 @@ const UserForm: React.FC<UserFormProps> = ({
     }   
   });
 
-  console.log(">>> ", user)
   const formUser = useForm<z.infer<typeof formSchemaUser>>({
     resolver: zodResolver(formSchemaUser),
     defaultValues: {

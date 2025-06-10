@@ -23,15 +23,15 @@ const handler = NextAuth({
             }
           );
           if (res.data && res.data.data) {
-            const user = res.data.data.user
             const token = res.data.data.token
+            const user = res.data.data.user;
             return {
-              id: user.id,
-              email: user.email,
-              image: "",
-              name: user.name,
-              accessToken: token,      // เพิ่ม field ที่ต้องการ
-              role: user.role,
+              id: user?.id || "",
+              email: user?.email || "",
+              image: user?.image || "",
+              name: user?.name || "",
+              accessToken: token,
+              role: user?.role || "", // Ensure role is provided
             }
           } 
           throw new Error(res.data?.message || "Invalid credentials");
@@ -51,17 +51,16 @@ const handler = NextAuth({
         token.email = user.email;
         token.name = user.name;
         token.accessToken = user.accessToken;
-        token.role = user.role;                  
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.email = token.email
-        session.user.name = token.name
-        session.user.role = token.role
-        session.accessToken = token.accessToken
-      }
+      const decodedToken = JSON.parse(
+          Buffer.from(token.accessToken.split(".")[1], "base64").toString()
+      );
+      session.user.email = decodedToken.email
+      session.user.role = decodedToken.role
+      session.accessToken = token.accessToken
       return session
     },
   },

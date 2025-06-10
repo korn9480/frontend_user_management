@@ -165,7 +165,7 @@ export default function Page() {
                             </div>
 
                             {/* Add User Button */}
-                            { session?.user.role.name == RoleUser.admin && (
+                            { session?.user.role == RoleUser.admin && (
                                 <Button onClick={handleAddUser}>
                                     <Plus className="w-4 h-4 mr-2" />
                                     เพิ่มผู้ใช้ใหม่
