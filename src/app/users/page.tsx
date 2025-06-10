@@ -2,7 +2,7 @@
 
 import { UserService } from "@/service/UserService";
 import { UserResponse } from "@/types/interface/response/user";
-import { useSession } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 import { useEffect, useState, useMemo } from "react";
 import { Search, Plus, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -117,12 +117,17 @@ export default function Page() {
         setUsers(usersCoppy)
         setDiologDeletedOpen(false)
     }
+
+    // method logout
+    const handleLogout =async () => {
+        await signOut({callbackUrl: "/login"})
+    }
     
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
+                <div className="mb-8 sm:flex sm:justify-between">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="p-2 bg-primary-foreground rounded-lg">
                             <Users className="w-6 h-6 text-primary" />
@@ -131,6 +136,9 @@ export default function Page() {
                             <h1 className="text-3xl font-bold text-gray-900">จัดการผู้ใช้</h1>
                             <p className="text-gray-600">จัดการข้อมูลผู้ใช้ในระบบ</p>
                         </div>
+                    </div>
+                    <div>
+                        <Button onClick={()=> handleLogout()}>ออกจากระบบ</Button>
                     </div>
                 </div>
 
