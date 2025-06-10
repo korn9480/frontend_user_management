@@ -185,8 +185,9 @@ export default function Page() {
 
                 {/* Users Grid - Horizontal layout */}
                 <div className="flex flex-wrap gap-4">
-                    {filteredUsers.map((user) => (
+                    {filteredUsers.map((user, index) => (
                         <UserCard
+                            key={index}
                             user={user}
                             colorRole={getRoleColor(user.role.name)}
                             handleEditUser={handleEditUser}
