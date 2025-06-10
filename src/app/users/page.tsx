@@ -13,6 +13,7 @@ import DrawerUserForm from "@/components/users/userForm";
 import { RoleUser } from "@/types/enum/role";
 import { UserCard } from "@/components/users/cardUser";
 import { DrawerModeFormUserEnum } from "@/types/enum/formUse";
+import UserDeletedDialog from "@/components/users/userDeleted";
 
 // Role colors mapping
 const getRoleColor = (roleName: string) => {
@@ -39,6 +40,9 @@ export default function Page() {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [drawerMode, setDrawerMode] = useState<DrawerModeFormUserEnum>(DrawerModeFormUserEnum.add);
     const [selectedUser, setSelectedUser] = useState<UserResponse | undefined>();
+
+    // delete states
+    const [diologDeletedOpen, setDiologDeletedOpen] = useState(false);
     
     useEffect(() => {
         const fetchUsers = async () => {
@@ -72,21 +76,23 @@ export default function Page() {
         });
     }, [users, searchTerm, roleFilter]);
 
+    // method create user
     const handleAddUser = () => {
         setDrawerMode(DrawerModeFormUserEnum.add);
         setSelectedUser(undefined);
         setDrawerOpen(true);
     };
 
+     const getNewlyCreatedUser = async (userNew: UserResponse) => {
+        setUsers([userNew, ...users])
+        setDrawerOpen(false);
+    };
+
+    // method edit user
     const handleEditUser = (user: UserResponse) => {
         setDrawerMode(DrawerModeFormUserEnum.edit);
         setSelectedUser(user);
         setDrawerOpen(true);
-    };
-
-    const getNewlyCreatedUser = async (userNew: UserResponse) => {
-        setUsers([userNew, ...users])
-        setDrawerOpen(false);
     };
 
     const getUpdatedUser = async (id: number, userUpdate: UserResponse) => {
@@ -100,16 +106,17 @@ export default function Page() {
         setDrawerOpen(false)
     }
 
-    const handleDeleteUser = async (userId: number) => {
-        if (confirm('คุณต้องการลบผู้ใช้นี้หรือไม่?')) {
-            try {
-                console.log('Deleting user:', userId);
-                setUsers(users.filter(user => user.id !== userId));
-            } catch (error) {
-                console.error("Error deleting user:", error);
-            }
-        }
+    // method delete user
+    const handleDeleteUser = async (user: UserResponse) => {
+        setSelectedUser(user)
+        setDiologDeletedOpen(true)
     };
+
+    const deleteUserSucceed = async (idUser: number) => {
+        const usersCoppy = users.filter((user)=> user.id != idUser)
+        setUsers(usersCoppy)
+        setDiologDeletedOpen(false)
+    }
     
     return (
         <div className="min-h-screen bg-gray-50 p-6">
@@ -204,24 +211,29 @@ export default function Page() {
                 open={drawerOpen}
                 onOpenChange={setDrawerOpen}
             >
-                 <DrawerContent>
-                    <DrawerHeader className="text-left">
-                        <DrawerTitle>Edit profile</DrawerTitle>
-                    </DrawerHeader>
-                    <div className="px-4 pb-16">
-                        <DrawerUserForm
-                            selectedUser={selectedUser}
-                            drawerOpen={drawerOpen}
-                            drawerMode={drawerMode}
-                            getNewlyCreatedUser={getNewlyCreatedUser}
-                            getUpdatedUser={getUpdatedUser}
-                            setDrawerOpen={setDrawerOpen}
-                        />
-                    </div>
-                    
-                    
+                <DrawerContent>
+                <DrawerHeader className="text-left">
+                    <DrawerTitle>Edit profile</DrawerTitle>
+                </DrawerHeader>
+                <div className="px-4 pb-16">
+                    <DrawerUserForm
+                        selectedUser={selectedUser}
+                        drawerOpen={drawerOpen}
+                        drawerMode={drawerMode}
+                        getNewlyCreatedUser={getNewlyCreatedUser}
+                        getUpdatedUser={getUpdatedUser}
+                        setDrawerOpen={setDrawerOpen}
+                    />
+                </div>
                 </DrawerContent>
             </Drawer>
+
+            <UserDeletedDialog 
+                open={diologDeletedOpen} 
+                onOpenChange={setDiologDeletedOpen} 
+                user={selectedUser} 
+                deleteSucceed={deleteUserSucceed}
+            />
         </div>
     );
 }

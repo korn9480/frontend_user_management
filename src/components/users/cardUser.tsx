@@ -7,7 +7,7 @@ interface UserCardProp {
     user: UserResponse
     colorRole: string
     handleEditUser: (user: UserResponse) => void
-    handleDeleteUser: (id: number) => void
+    handleDeleteUser: (user: UserResponse) => void
 }
 export function UserCard({user ,colorRole, handleDeleteUser,handleEditUser}: UserCardProp) {
     const formatDate = (dateString: string) => {
@@ -68,7 +68,7 @@ export function UserCard({user ,colorRole, handleDeleteUser,handleEditUser}: Use
             <Button
               size="icon"
               variant="outline"
-              onClick={() => handleDeleteUser(user.id)}
+              onClick={() => handleDeleteUser(user)}
               className="text-red-600 hover:text-red-700 hover:bg-red-50"
               title="ลบ"
             >
