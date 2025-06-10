@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import axios from "axios";
-
+import { AuthService } from "@/service/authService";
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
@@ -11,20 +10,15 @@ const handler = NextAuth({
         password: { label: "password", type: "password" },
       },
       async authorize(credentials, req) {
+        const authService = new AuthService()
         try {
-          const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_BACKEND}/auth/login`,
-            {
-              email: credentials?.username,
-              password: credentials?.password,
-            },
-            {
-              validateStatus: () => true
-            }
-          );
-          if (res.data && res.data.data) {
-            const token = res.data.data.token
-            const user = res.data.data.user;
+          const res = await authService.login({
+            email: credentials?.username?? "",
+            password: credentials?.password ?? ""
+          })
+          if (res.data) {
+            const token = res.data.token
+            const user = res.data.user;
             return {
               id: user?.id || "",
               email: user?.email || "",
