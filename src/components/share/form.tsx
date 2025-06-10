@@ -13,6 +13,7 @@ type FieldInputProps<T extends FieldValues> = {
   readonly label: string
   readonly placeholder?: string,
   readonly icon?: ReactNode 
+  readonly disabled?: boolean
 }
 
 type FieldSelectOption = {
@@ -29,7 +30,8 @@ export function FieldInput<T extends FieldValues>({
   name,
   label,
   placeholder,
-  icon
+  icon,
+  disabled
 }: FieldInputProps<T>) {
   return (
     <FormField
@@ -46,7 +48,7 @@ export function FieldInput<T extends FieldValues>({
                     {icon}
                   </span>
                 )}
-                <Input className={`${icon ? "pl-10" : ""} ${fieldState.invalid ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`} placeholder={placeholder} {...field} />
+                <Input className={`${icon ? "pl-10" : ""} ${fieldState.invalid ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`} placeholder={placeholder} {...field} disabled={disabled}/>
               </div>
             </FormControl>
           </div>
@@ -62,7 +64,8 @@ export function FieldInputPassword<T extends FieldValues>({
   name,
   label,
   placeholder,
-  icon
+  icon,
+  disabled
 }: FieldInputProps<T>) {
   const [showPassword, setShowPassword] = useState(false);
   return (
@@ -81,7 +84,7 @@ export function FieldInputPassword<T extends FieldValues>({
                   </span>
                 )}
                 <Input type={showPassword ? "text" : "password"} 
-                  className={`${icon ? "pl-10" : ""} ${fieldState.invalid ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`} placeholder={placeholder} {...field} 
+                  className={`${icon ? "pl-10" : ""} ${fieldState.invalid ? "border-red-500 focus:border-red-500 focus:ring-red-500" : ""}`} placeholder={placeholder} {...field} disabled={disabled}
                 />
                 <Button
                 type="button"
@@ -113,6 +116,7 @@ export function FieldSelect<T extends FieldValues>
   label,
   placeholder,
   icon,
+  disabled,
   options
 }: FieldSelectProps<T>){
   return (
@@ -131,6 +135,7 @@ export function FieldSelect<T extends FieldValues>
                   </span>
                 )}
                 <Select
+                  disabled={disabled}
                   value={field.value}
                   onValueChange={field.onChange}
                   defaultValue={field.value}

@@ -1,7 +1,7 @@
 import { ApiClient } from './api';
 import { UserResponse } from '@/types/interface/response/user';
 import { ApiResponse } from '@/types/interface/response/apiResponse';
-import { UserDto } from '@/types/interface/formData/user';
+import { UserDtoCreated, UserDtoUpdate } from '@/types/interface/formData/user';
 export class UserService {
   private readonly api = ApiClient.getInstance().getApi();
 
@@ -16,7 +16,7 @@ export class UserService {
     return respose.data
   }
 
-  async createUser(body: UserDto): Promise<ApiResponse<UserResponse>> {
+  async createUser(body: UserDtoCreated): Promise<ApiResponse<UserResponse>> {
     console.log("🚀 ~ UserService ~ createUser ~ body:", body)
     const respose = await this.api.post("/user",{
       ...body,
@@ -25,7 +25,7 @@ export class UserService {
     return respose.data
   }
 
-  async updateUser(id: number, body: UserDto): Promise<ApiResponse<UserResponse>> {
+  async updateUser(id: number, body: UserDtoUpdate): Promise<ApiResponse<UserResponse>> {
     const respose = await this.api.put(`/user/${id}`,body)
     return respose.data
   }

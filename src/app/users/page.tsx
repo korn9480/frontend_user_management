@@ -72,16 +72,6 @@ export default function Page() {
         });
     }, [users, searchTerm, roleFilter]);
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('th-TH', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
-
     const handleAddUser = () => {
         setDrawerMode(DrawerModeFormUserEnum.add);
         setSelectedUser(undefined);
@@ -95,14 +85,20 @@ export default function Page() {
     };
 
     const getNewlyCreatedUser = async (userNew: UserResponse) => {
-        if (drawerMode === DrawerModeFormUserEnum.add) {
-            // const resUser =  await userService.createUser(formData)
-            setUsers([userNew, ...users])
-            setDrawerOpen(false);
-        } else if (drawerMode === DrawerModeFormUserEnum.edit && selectedUser) {
-            setDrawerOpen(false);
-        }
+        setUsers([userNew, ...users])
+        setDrawerOpen(false);
     };
+
+    const getUpdatedUser = async (id: number, userUpdate: UserResponse) => {
+        const usersCoppy = users.map((user)=> {
+            if(user.id == id) {
+                return userUpdate
+            } 
+            return user
+        })
+        setUsers(usersCoppy)
+        setDrawerOpen(false)
+    }
 
     const handleDeleteUser = async (userId: number) => {
         if (confirm('คุณต้องการลบผู้ใช้นี้หรือไม่?')) {
@@ -218,6 +214,7 @@ export default function Page() {
                             drawerOpen={drawerOpen}
                             drawerMode={drawerMode}
                             getNewlyCreatedUser={getNewlyCreatedUser}
+                            getUpdatedUser={getUpdatedUser}
                             setDrawerOpen={setDrawerOpen}
                         />
                     </div>
