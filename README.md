@@ -15,15 +15,19 @@
 ### 🔐 ระบบการยืนยันตัวตน
 - ระบบ Login โดยใช้ NextAuth
 - การจัดการ Session และ Authentication
+- ระบบ register
 
 ### 👥 การจัดการผู้ใช้
 - **Get Users**: ดูรายชื่อผู้ใช้ทั้งหมด
 - **Add User**: เพิ่มผู้ใช้ใหม่
+- **Edit User**: เเก้ข้อมูลผู้ใช้งาน
+- **Delete User**: ลบผู้ใช้งาน
 
 ## 📱 หน้าเว็บไซต์
 
 1. **หน้า Login** - สำหรับการเข้าสู่ระบบ
 2. **หน้า User** - สำหรับการจัดการข้อมูลผู้ใช้
+3. **หน้า register** - สำหรับสมัครสมาชิก
 
 ## 🛠 การติดตั้งและใช้งาน
 
@@ -31,13 +35,30 @@
 
 ```bash
 # Clone โปรเจคจาก GitHub
-git clone <repository-url>
+git clone https://github.com/korn9480/frontend_user_management.git
 
 # เข้าไปในโฟลเดอร์โปรเจค
 cd frontend_user_management
 ```
 
+### ขั้นตอนที่ 2: รันโปรเจค
+
+#### ขั้นตอนที่ 2.1 : รันโปรเจคบนเครื่องของตัวเอง
+
+ต้องติด bun ก่อน เพราะผมใช้ bun แทน npm
+ลิ้งติดตั้ง bun : https://bun.sh/docs/installation
+
+```bash
+# ติดตั้ง dependencies
+bun install
+
+# รันในโหมดพัฒนา
+bun run dev
+```
+
 ### ขั้นตอนที่ 2: รัน Docker Compose
+
+- **หมายเหตุ** docker compose สามารถเข้าได้เเค่หน้า login เท่านั้น เพราะมีปัญหาเรื่อง network ของ docker ทำให้ api backend ใช้ไม่ได้ จึงส่งผลให้ไม่สามารถไป login ขอ token จาก backend มาเพื่อเข้าระบบได้ เเนะนำให้ใช้วิธีรัน โปรเจคในเครื่องตัวเอง 😁😁
 
 ```bash
 # รันคำสั่งสำหรับ Docker Compose
@@ -54,20 +75,6 @@ docker compose up -d
 เปิดเบราว์เซอร์และไปที่:
 ```
 http://localhost:3000
-```
-
-## 🔧 การพัฒนาเพิ่มเติม
-
-### การติดตั้งในโหมดพัฒนา (Development Mode)
-
-หากต้องการพัฒนาโปรเจคเพิ่มเติม:
-
-```bash
-# ติดตั้ง dependencies
-bun install
-
-# รันในโหมดพัฒนา
-bun run dev
 ```
 
 ### โครงสร้างโปรเจค
@@ -87,3 +94,18 @@ frontend_user_management/
 ## 🎨 UI Components
 
 โปรเจคนี้ใช้ **shadcn/ui** สำหรับ UI components ที่มีความสวยงามและใช้งานง่าย
+
+## ➕ สิ่งพัฒนาเพิ่มจากครั้งเเรก
+
+### ✨ ฟีเจอร์
+
+- **Edit User**: เเก้ข้อมูลผู้ใช้งาน
+- **Delete User**: ลบผู้ใช้งาน
+- **Auth**: มีตรวจสอบสิทธิ์ก่อนจะเข้าหน้า users
+
+## 📱 หน้าเว็บไซต์
+- **หน้า register** - สำหรับสมัครสมาชิก
+
+### 🤔 logic
+
+- การจัดการเกี่ยวกับ form เปลี่ยนจากใช้ useState มาเป็น ใช้ useForm
