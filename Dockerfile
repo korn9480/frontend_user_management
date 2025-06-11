@@ -16,11 +16,6 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN \
-  if [ "$ISPRODUCTION" = "true" ]; \
-    then cp .env.prod .env; \
-    else cp .env.local .env; \
-  fi
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
@@ -50,7 +45,6 @@ RUN chown nextjs:bun .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:bun /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:bun /app/.next/static ./.next/static
-
 USER nextjs
 
 EXPOSE 3000
